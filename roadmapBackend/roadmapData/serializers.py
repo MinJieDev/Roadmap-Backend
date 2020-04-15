@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Article
+from roadmapData import models
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -11,5 +11,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Article
+        model = models.Article
+        fields = '__all__'
+
+
+class EssaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Essay
         fields = '__all__'
