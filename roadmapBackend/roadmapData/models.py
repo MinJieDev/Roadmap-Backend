@@ -14,3 +14,7 @@ class Article(models.Model):
 
 class Essay(models.Model):
     text = models.TextField(blank=True, default='')
+
+
+class RoadMap(models.Model):
+    text = models.TextField(blank=True, default='')

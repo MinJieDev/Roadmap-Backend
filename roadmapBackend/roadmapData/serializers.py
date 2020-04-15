@@ -19,3 +19,9 @@ class EssaySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Essay
         fields = '__all__'
+
+
+class RoadMapSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.RoadMap
+        fields = '__all__'

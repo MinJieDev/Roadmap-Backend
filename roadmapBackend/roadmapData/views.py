@@ -17,3 +17,8 @@ class ArticleViewSet(viewsets.ModelViewSet):
 class EssayViewSet(viewsets.ModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer
+
+
+class RoadMapViewSet(viewsets.ModelViewSet):
+    queryset = models.RoadMap.objects
+    serializer_class = serializers.RoadMapSerializer
