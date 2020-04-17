@@ -15,7 +15,7 @@ class Article(models.Model):
 
 
 class ReadRecord(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     article = models.OneToOneField(Article, on_delete=models.CASCADE, blank=True, null=True)
 
     read_state = models.BooleanField(blank=True, default=False)
