@@ -14,6 +14,11 @@ class ArticleViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ArticleSerializer
 
 
+class ReadRecordViewSet(viewsets.ModelViewSet):
+    queryset = models.ReadRecord.objects
+    serializer_class = serializers.ReadRecordSerializer
+
+
 class EssayViewSet(viewsets.ModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer

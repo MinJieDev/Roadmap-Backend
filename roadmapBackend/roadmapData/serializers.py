@@ -15,6 +15,12 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ReadRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ReadRecord
+        fields = '__all__'
+
+
 class EssaySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Essay
