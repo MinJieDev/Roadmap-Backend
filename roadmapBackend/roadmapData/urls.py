@@ -1,6 +1,7 @@
 from django.urls import include, path
 from roadmapData import views
 from rest_framework.routers import DefaultRouter
+from rest_framework.documentation import include_docs_urls
 
 router = DefaultRouter()
 router.register('users', views.UserViewSet, basename='users')
@@ -11,4 +12,5 @@ router.register('road_maps', views.RoadMapViewSet, basename='road_maps')
 
 urlpatterns = [
     path('api/', include(router.urls)),
+    path('api/docs/', include_docs_urls(title='api', public=False)),
 ]
