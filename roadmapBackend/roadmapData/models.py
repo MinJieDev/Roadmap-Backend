@@ -25,6 +25,7 @@ class ReadRecord(models.Model):
 class Essay(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
 
+    title = models.CharField(max_length=200, blank=True, default='')
     text = models.TextField(blank=True, default='')
 
 
@@ -34,4 +35,6 @@ class RoadMap(models.Model):
     essays = models.ManyToManyField(Essay, blank=True)
     road_maps = models.ManyToManyField("self", blank=True)
 
+    title = models.CharField(max_length=200, blank=True, default='')
     text = models.TextField(blank=True, default='')
+    description = models.TextField(blank=True, default='')

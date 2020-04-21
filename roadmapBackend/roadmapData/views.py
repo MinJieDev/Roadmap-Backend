@@ -2,6 +2,7 @@ from rest_framework import viewsets, views
 from django.contrib.auth.models import User
 from roadmapData import models
 from roadmapData import serializers
+from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -27,3 +28,7 @@ class EssayViewSet(viewsets.ModelViewSet):
 class RoadMapViewSet(viewsets.ModelViewSet):
     queryset = models.RoadMap.objects
     serializer_class = serializers.RoadMapSerializer
+
+    def list(self, request, *args, **kwargs):
+        serializer = serializers.RoadMapViewSetSerializer(self.queryset, many=True)
+        return Response(serializer.data)

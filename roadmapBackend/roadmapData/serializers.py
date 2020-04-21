@@ -31,3 +31,10 @@ class RoadMapSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.RoadMap
         fields = '__all__'
+
+
+class RoadMapViewSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.RoadMap
+        fields = ('title', 'description',
+                  'user', 'articles', 'essays', 'road_maps')
