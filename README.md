@@ -3,7 +3,13 @@
 
 ## Getting Started
 ### Installation
-`pip3 install django`
+`pip install -r requirements.txt`
+
+## Entity Relationship Diagram
+
+<center class="half">
+    <img src="./asserts/ER.jpg"/>
+</center> 
 
 ## Development
 
