@@ -11,7 +11,7 @@ class Article(models.Model):
     volume = models.IntegerField(blank=True, default=0)
     pages = models.IntegerField(blank=True, default=0)
     years = models.IntegerField(blank=True, default=0)
-    url = models.URLField(max_length=200, default="")
+    url = models.URLField(blank=True, default="")
 
 
 class ReadRecord(models.Model):
