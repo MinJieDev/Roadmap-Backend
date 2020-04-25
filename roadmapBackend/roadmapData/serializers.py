@@ -1,12 +1,25 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
+
 from roadmapData import models
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ('username', 'email', 'password')
+        model = models.User
+        fields = ('username', 'email', 'password', 'token')
+
+    def create(self, validated_data):
+        user = super().create(validated_data)
+
+        payload = jwt_payload_handler(user)
+        token = jwt_encode_handler(payload)
+        user.set_password(validated_data['password'])
+        user.save()
+
+        user.token = token
+        user.save()
+        return user
 
 
 class ArticleSerializer(serializers.ModelSerializer):
