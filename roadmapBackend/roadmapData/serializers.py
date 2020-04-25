@@ -18,7 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
 
         user.token = token
-        user.save()
         return user
 
 
