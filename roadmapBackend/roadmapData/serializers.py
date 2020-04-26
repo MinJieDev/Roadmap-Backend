@@ -7,7 +7,7 @@ from roadmapData import models
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('username', 'email', 'password', 'token')
+        fields = ('username', 'email', 'password')
 
     def create(self, validated_data):
         user = super().create(validated_data)
