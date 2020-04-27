@@ -7,17 +7,12 @@ from roadmapData import models
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('username', 'email', 'password')
+        fields = ('id', 'email', 'username', 'password')
 
     def create(self, validated_data):
-        user = super().create(validated_data)
-
-        payload = jwt_payload_handler(user)
-        token = jwt_encode_handler(payload)
+        user = super(UserSerializer, self).create(validated_data=validated_data)
         user.set_password(validated_data['password'])
         user.save()
-
-        user.token = token
         return user
 
 

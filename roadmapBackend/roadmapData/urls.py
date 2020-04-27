@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
-from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
 
 from roadmapData import views
 
@@ -15,7 +15,10 @@ router.register('road_maps', views.RoadMapViewSet, basename='road_maps')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', obtain_jwt_token),
     path('api/', include(router.urls)),
     path('api/docs/', include_docs_urls(title='api', public=False)),
+    path('login/', obtain_jwt_token),
+    path('refresh/', refresh_jwt_token),
+    path('verify/', verify_jwt_token),
+
 ]
