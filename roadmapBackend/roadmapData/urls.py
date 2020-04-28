@@ -18,7 +18,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/docs/', include_docs_urls(title='api', public=False)),
-    path('login/', obtain_jwt_token),
-    path('refresh/', refresh_jwt_token),
-    path('verify/', verify_jwt_token),
+    path('api/login/', obtain_jwt_token),
+    path('api/refresh/', refresh_jwt_token),
+    path('api/verify/', verify_jwt_token),
 ]
