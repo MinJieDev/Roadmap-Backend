@@ -45,3 +45,9 @@ class RoadMapViewSetSerializer(serializers.ModelSerializer):
         model = models.RoadMap
         fields = ('id', 'title', 'description',
                   'user', 'articles', 'essays', 'road_maps')
+
+
+class FeedbackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Feedback
+        fields = '__all__'

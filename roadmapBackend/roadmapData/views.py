@@ -54,3 +54,8 @@ class RoadMapViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         serializer = serializers.RoadMapViewSetSerializer(self.queryset, many=True)
         return Response(serializer.data)
+
+
+class FeedbackViewSet(viewsets.ModelViewSet):
+    queryset = models.Feedback.objects
+    serializer_class = serializers.FeedbackSerializer

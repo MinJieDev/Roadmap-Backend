@@ -44,3 +44,7 @@ class RoadMap(models.Model):
     title = models.CharField(max_length=200, blank=True, default='')
     text = models.TextField(blank=True, default='')
     description = models.TextField(blank=True, default='')
+
+
+class Feedback(models.Model):
+    text = models.TextField(default='')
