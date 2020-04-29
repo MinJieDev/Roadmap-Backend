@@ -42,5 +42,10 @@ class RoadMap(models.Model):
     description = models.TextField(blank=True, default='')
 
 
+class RoadMapShareId(models.Model):
+    roadmap = models.ForeignKey(RoadMap, on_delete=models.CASCADE)
+    sha256 = models.CharField(max_length=64)
+
+
 class Feedback(models.Model):
     text = models.TextField(default='')
