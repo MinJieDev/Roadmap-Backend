@@ -65,26 +65,29 @@ class RoadMapViewSet(UserModelViewSet):
     permission_classes = (IsAuthenticated,)
 
 
-class RoadMapShareViewSet:
-    @staticmethod
-    def get(request, map_sha256):
+class GetSharedRoadMapView(APIView):
+    def get(self, request, map_sha256):
         print(map_sha256)
         roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
         serializer = RoadMapSerializer(roadmap)
         print(serializer.data)
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
 
-    @staticmethod
-    def post(request):
+
+class CreateOrGetRoadMapShareIdView(APIView):
+    def post(self, request):
         try:
             road_map_id = json.loads(request.body)['id']
         except:
             raise exceptions.ParseError()
 
         roadmap = get_object_or_404(RoadMap, id=road_map_id)
+
+        if roadmap.user != request.user:
+            self.permission_denied(request)
+
         code = 'roadmap{}'.format(road_map_id)
         sha256 = sha256_func(code.encode()).hexdigest()
-        print(str(sha256))
         try:
             record = RoadMapShareId.objects.get(sha256=sha256)
             record.roadmap = roadmap
@@ -92,7 +95,7 @@ class RoadMapShareViewSet:
             record = RoadMapShareId.objects.create(sha256=sha256,
                                                    roadmap=roadmap)
         record.save()
-        return JsonResponse({'share_id': sha256})
+        return Response({'share_id': sha256})
 
 
 class FeedbackViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
