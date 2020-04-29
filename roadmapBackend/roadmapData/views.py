@@ -7,7 +7,7 @@ from roadmapData import models
 from roadmapData import serializers
 from rest_framework.response import Response
 
-from roadmapBackend.roadmapData.auth import TokenAuth
+from roadmapData.auth import TokenAuth
 
 
 class UserViewSet(viewsets.ModelViewSet):
