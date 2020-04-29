@@ -6,6 +6,9 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify
 
 from roadmapData import views
 
+
+from roadmapData.views import CreateOrGetRoadMapShareIdView, GetSharedRoadMapView
+
 router = DefaultRouter()
 router.register('users', views.UserViewSet, basename='users')
 router.register('articles', views.ArticleViewSet, basename='articles')
@@ -20,4 +23,6 @@ urlpatterns = [
     path('api/login/', obtain_jwt_token),
     path('api/refresh/', refresh_jwt_token),
     path('api/verify/', verify_jwt_token),
+    path('api/share/roadmap/<str:map_sha256>/', GetSharedRoadMapView.as_view()),
+    path('api/share/roadmap/', CreateOrGetRoadMapShareIdView.as_view())
 ]
