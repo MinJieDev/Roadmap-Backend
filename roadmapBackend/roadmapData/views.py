@@ -8,8 +8,6 @@ from roadmapData import models
 from roadmapData import serializers
 from rest_framework.response import Response
 
-from roadmapData.auth import TokenAuth
-
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = models.User.objects
