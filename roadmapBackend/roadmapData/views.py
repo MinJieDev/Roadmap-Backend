@@ -39,12 +39,6 @@ class ArticleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
 
 
-class ReadRecordViewSet(viewsets.ModelViewSet):
-    queryset = models.ReadRecord.objects
-    serializer_class = serializers.ReadRecordSerializer
-    permission_classes = (IsAuthenticated,)
-
-
 class EssayViewSet(viewsets.ModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer

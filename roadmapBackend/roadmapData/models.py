@@ -19,24 +19,20 @@ class Article(models.Model):
     years = models.IntegerField(blank=True, default=0)
     url = models.CharField(max_length=100, blank=True, default="")
 
-
-class ReadRecord(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
-    article = models.OneToOneField(Article, on_delete=models.CASCADE, blank=True)
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     read_state = models.BooleanField(blank=True, default=False)
-    text = models.TextField(blank=True, default='')
+    note = models.TextField(blank=True, default='')
 
 
 class Essay(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     title = models.CharField(max_length=200, blank=True, default='')
     text = models.TextField(blank=True, default='')
 
 
 class RoadMap(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     road_maps = models.ManyToManyField("self", blank=True, symmetrical=False)
     articles = models.ManyToManyField(Article, blank=True)
     essays = models.ManyToManyField(Essay, blank=True)
