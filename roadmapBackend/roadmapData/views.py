@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework import authentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
@@ -35,6 +36,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = models.Article.objects
     serializer_class = serializers.ArticleSerializer
+    permission_classes = (IsAuthenticated,)
 
 
 class ReadRecordViewSet(viewsets.ModelViewSet):
