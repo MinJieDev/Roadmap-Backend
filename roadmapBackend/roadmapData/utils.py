@@ -8,7 +8,7 @@ class UserRetrieveModelMixin(mixins.RetrieveModelMixin):
         instance = self.get_object()
         user = request.user
         if instance.user != user:
-            return exceptions.PermissionDenied()
+            raise exceptions.PermissionDenied()
 
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
