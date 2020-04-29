@@ -3,6 +3,9 @@
 ### venv ###
 venv/
 
+### jb ide
+.idea/
+
 ### OSX ###
 .DS_Store
 .AppleDouble

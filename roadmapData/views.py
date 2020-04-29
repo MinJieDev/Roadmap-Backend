@@ -10,16 +10,16 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
-from roadmapData import models
-from roadmapData import serializers
+from . import models
+from . import serializers
 from rest_framework.response import Response
 
-from roadmapData.utils import UserModelViewSet
+from .utils import UserModelViewSet
 
-from roadmapData.models import RoadMapShareId, RoadMap
+from .models import RoadMapShareId, RoadMap
 from _sha256 import sha256 as sha256_func
 
-from roadmapData.serializers import RoadMapSerializer
+from .serializers import RoadMapSerializer
 
 
 class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
