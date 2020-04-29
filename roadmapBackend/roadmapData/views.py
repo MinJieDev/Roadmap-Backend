@@ -64,4 +64,3 @@ class RoadMapViewSet(viewsets.ModelViewSet):
 class FeedbackViewSet(viewsets.ModelViewSet):
     queryset = models.Feedback.objects
     serializer_class = serializers.FeedbackSerializer
-    permission_classes = (IsAuthenticated,)
