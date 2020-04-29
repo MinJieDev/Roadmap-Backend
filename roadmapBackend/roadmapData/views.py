@@ -7,6 +7,8 @@ from roadmapData import models
 from roadmapData import serializers
 from rest_framework.response import Response
 
+from roadmapBackend.roadmapData.auth import TokenAuth
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = models.User.objects
@@ -35,6 +37,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = models.Article.objects
     serializer_class = serializers.ArticleSerializer
+    authentication_classes = (TokenAuth,)
 
 
 class ReadRecordViewSet(viewsets.ModelViewSet):
