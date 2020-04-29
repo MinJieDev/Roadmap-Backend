@@ -41,10 +41,41 @@ class UserCreateModelMixin(mixins.CreateModelMixin):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
+class UserUpdateModelMixin(mixins.UpdateModelMixin):
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        instance = self.get_object()
+        if instance.user != user:
+            raise exceptions.PermissionDenied()
+
+        partial = kwargs.pop('partial', False)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+
+class UserDestroyModelMixin(mixins.DestroyModelMixin):
+    def destroy(self, request, *args, **kwargs):
+        user = request.user
+        instance = self.get_object()
+        if instance.user != user:
+            raise exceptions.PermissionDenied()
+
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class UserModelViewSet(UserCreateModelMixin,
                        UserRetrieveModelMixin,
-                       mixins.UpdateModelMixin,
-                       mixins.DestroyModelMixin,
+                       UserUpdateModelMixin,
+                       UserDestroyModelMixin,
                        UserListModelMixin,
                        GenericViewSet):
     pass

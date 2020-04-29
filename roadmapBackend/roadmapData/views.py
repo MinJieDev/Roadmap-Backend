@@ -41,20 +41,16 @@ class ArticleViewSet(UserModelViewSet):
     permission_classes = (IsAuthenticated,)
 
 
-class EssayViewSet(viewsets.ModelViewSet):
+class EssayViewSet(UserModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer
     permission_classes = (IsAuthenticated,)
 
 
-class RoadMapViewSet(viewsets.ModelViewSet):
+class RoadMapViewSet(UserModelViewSet):
     queryset = models.RoadMap.objects
     serializer_class = serializers.RoadMapSerializer
     permission_classes = (IsAuthenticated,)
-
-    def list(self, request, *args, **kwargs):
-        serializer = serializers.RoadMapViewSetSerializer(self.queryset, many=True)
-        return Response(serializer.data)
 
 
 class FeedbackViewSet(viewsets.ModelViewSet):
