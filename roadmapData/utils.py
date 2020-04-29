@@ -48,8 +48,11 @@ class UserUpdateModelMixin(mixins.UpdateModelMixin):
         if instance.user != user:
             raise exceptions.PermissionDenied()
 
+        data = request.data
+        data['user'] = request.user.id
+
         partial = kwargs.pop('partial', False)
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer = self.get_serializer(instance, data=data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
 
