@@ -6,6 +6,9 @@ venv/
 ### jb ide
 .idea/
 
+### configuration files including security information
+*.conf
+
 ### OSX ###
 .DS_Store
 .AppleDouble
