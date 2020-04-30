@@ -97,7 +97,7 @@ DATABASES = {
         'OPTIONS': {
             'read_default_file': os.path.join(BASE_DIR, 'db.conf'),
             'init_command':
-                'SET storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci',
+                'SET default_storage_engine=INNODB,character_set_connection=utf8,collation_connection=utf8_unicode_ci',
         }
     }
 }
