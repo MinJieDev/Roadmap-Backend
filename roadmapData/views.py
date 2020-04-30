@@ -1,5 +1,5 @@
 import json
-
+import re
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, status, mixins, exceptions
 from rest_framework import authentication
@@ -16,10 +16,10 @@ from rest_framework.response import Response
 
 from .utils import UserModelViewSet
 
-from .models import RoadMapShareId, RoadMap
+from .models import RoadMapShareId, RoadMap, Article
 from _sha256 import sha256 as sha256_func
 
-from .serializers import RoadMapSerializer
+from .serializers import RoadMapSerializer, ArticleSerializer
 
 
 class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
@@ -66,12 +66,26 @@ class RoadMapViewSet(UserModelViewSet):
 
 
 class GetSharedRoadMapView(APIView):
+    ARTICLE_REG = re.compile(r'^\$(\d+)$')
+
     def get(self, request, map_sha256):
-        print(map_sha256)
         roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
         serializer = RoadMapSerializer(roadmap)
-        print(serializer.data)
-        return Response(serializer.data)
+        data = serializer.data
+        roadmap_meta = json.loads(data['text'])
+        nodes = roadmap_meta.get('nodes', [])
+        picked_articles = []
+
+        for node in nodes:
+            title = node.get('text', '')
+            pattern = self.ARTICLE_REG.match(title)
+            if pattern is not None:
+                article_id = int(pattern.group(1))
+                picked_articles.append(article_id)
+        picked_articles = Article.objects.filter(user=roadmap.user, id__in=picked_articles)
+        picked_articles = ArticleSerializer(picked_articles, many=True).data
+        data['articles'] = picked_articles
+        return Response(data)
 
 
 class CreateOrGetRoadMapShareIdView(APIView):
