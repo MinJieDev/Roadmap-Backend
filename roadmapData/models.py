@@ -12,7 +12,7 @@ class Article(models.Model):
     article_references = models.ManyToManyField("self", blank=True, symmetrical=False)
 
     title = models.CharField(max_length=200, blank=True, default='')
-    author = models.CharField(max_length=200, blank=True, default='')
+    author = models.TextField(blank=True, default='')
     journal = models.CharField(max_length=200, blank=True, default='')
     volume = models.IntegerField(blank=True, default=0)
     pages = models.IntegerField(blank=True, default=0)
