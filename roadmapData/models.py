@@ -49,3 +49,12 @@ class RoadMapShareId(models.Model):
 
 class Feedback(models.Model):
     text = models.TextField(default='')
+
+
+class Tag(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, blank=True, default='')
+
+    essays = models.ManyToManyField(Essay, blank=True)
+    roadmaps = models.ManyToManyField(RoadMap, blank=True)
+    articles = models.ManyToManyField(Article, blank=True)
