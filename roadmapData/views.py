@@ -116,3 +116,9 @@ class FeedbackViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
                       GenericViewSet):
     queryset = models.Feedback.objects
     serializer_class = serializers.FeedbackSerializer
+
+
+class TagViewSet(UserModelViewSet):
+    queryset = models.Tag.objects
+    serializer_class = serializers.TagSerializer
+    permission_classes = (IsAuthenticated,)
