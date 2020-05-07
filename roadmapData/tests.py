@@ -18,7 +18,7 @@ class PermissionTest(APITestCase):
 
         self.client2 = APIClient()
         self.client2.post("/api/users/",
-                          {"email": "hdl@qq.com", "password": "jiemin", "username": "hdl"},
+                          {"email   ": "hdl@qq.com", "password": "jiemin", "username": "hdl"},
                           format='json')
         response = self.client2.post("/api/login/",
                                      {"username": "hdl", "password": "jiemin"},
@@ -114,6 +114,71 @@ class PermissionTest(APITestCase):
                                     HTTP_AUTHORIZATION=self.http_authorization2,
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client1.post("/api/share/roadmap/", {"id": 1},
+                                     HTTP_AUTHORIZATION=self.http_authorization1,
+                                     format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_roadmap_permission(self):
+        response = self.client1.post("/api/road_maps/",
+                                     {"title": "my roadmap", "text": "test", "description": "description"},
+                                     format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client1.post("/api/road_maps/",
+                                     {"title": "my roadmap", "text": "test", "description": "description"},
+                                     HTTP_AUTHORIZATION=self.http_authorization1, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client1.get("/api/road_maps/1.json", format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        response = self.client1.get("/api/road_maps/1.json",
+                                    HTTP_AUTHORIZATION=self.http_authorization1,
+                                    format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client1.get("/api/road_maps/2.json",
+                                    HTTP_AUTHORIZATION=self.http_authorization1,
+                                    format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        response = self.client2.get("/api/road_maps/1.json",
+                                    HTTP_AUTHORIZATION=self.http_authorization2,
+                                    format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        response = self.client1.post("/api/share/roadmap/", {"id": 1},
+                                     HTTP_AUTHORIZATION=self.http_authorization1,
+                                     format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_roadmap_share_permission(self):
+        response = self.client1.post("/api/road_maps/",
+                                     {"title": "my roadmap", "text": "{}", "description": "description"},
+                                     HTTP_AUTHORIZATION=self.http_authorization1,
+                                     format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        response = self.client1.post("/api/share/roadmap/", {"id": 10},
+                                     HTTP_AUTHORIZATION=self.http_authorization1,
+                                     format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        response = self.client1.post("/api/share/roadmap/", {"id": 1},
+                                     HTTP_AUTHORIZATION=self.http_authorization1,
+                                     format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        share_id = json.loads(response.content)["share_id"]
+        response = self.client2.get("/api/share/roadmap/" + share_id + "/",
+                                    format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client2.get("/api/share/roadmap/1/",
+                                    format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class AuthTest(APITestCase):
