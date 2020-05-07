@@ -120,40 +120,6 @@ class PermissionTest(APITestCase):
                                      format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_roadmap_permission(self):
-        response = self.client1.post("/api/road_maps/",
-                                     {"title": "my roadmap", "text": "test", "description": "description"},
-                                     format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        response = self.client1.post("/api/road_maps/",
-                                     {"title": "my roadmap", "text": "test", "description": "description"},
-                                     HTTP_AUTHORIZATION=self.http_authorization1, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        response = self.client1.get("/api/road_maps/1.json", format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-        response = self.client1.get("/api/road_maps/1.json",
-                                    HTTP_AUTHORIZATION=self.http_authorization1,
-                                    format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        response = self.client1.get("/api/road_maps/2.json",
-                                    HTTP_AUTHORIZATION=self.http_authorization1,
-                                    format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-        response = self.client2.get("/api/road_maps/1.json",
-                                    HTTP_AUTHORIZATION=self.http_authorization2,
-                                    format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        response = self.client1.post("/api/share/roadmap/", {"id": 1},
-                                     HTTP_AUTHORIZATION=self.http_authorization1,
-                                     format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     def test_roadmap_share_permission(self):
         response = self.client1.post("/api/road_maps/",
                                      {"title": "my roadmap", "text": "{}", "description": "description"},
