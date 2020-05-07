@@ -128,6 +128,11 @@ class ModelTest(APITestCase):
         response_content = json.loads(response.content)
 
         # get
+        response = self.client.get("/api/road_maps/", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content[0]['title'], "my roadmap")
+
         response = self.client.get("/api/road_maps/1.json", format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_content = json.loads(response.content)
@@ -147,4 +152,52 @@ class ModelTest(APITestCase):
         response = self.client.delete("/api/road_maps/1.json", format='json')
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         response = self.client.get("/api/road_maps/1.json", format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_feed_back_model(self):   
+        #post
+        data = {
+            "text": "This product is great"
+        }
+        response = self.client.post("/api/feedback/", data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response_content = json.loads(response.content)
+
+    def test_tag_model(self):
+        # get token
+        data = {
+            "password": "minjie",
+            "username": "zzy"
+        }
+        response = self.client.post("/api/login/", data, format='json')
+        user_token = json.loads(response.content)['token']
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + user_token)
+        
+        #post
+        data = {
+            "name": "leetcode"
+        }
+        response = self.client.post("/api/tags/", data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response_content = json.loads(response.content)
+
+        # get
+        response = self.client.get("/api/tags/1.json", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content['name'], "leetcode")
+
+        # update
+        data = {
+            "name": "codeforces"
+        }
+        response = self.client.put("/api/tags/1.json", data=data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_content = json.loads(response.content)
+        self.assertEqual(response_content["name"], "codeforces")
+
+        # delete
+        response = self.client.delete("/api/tags/1.json", format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        response = self.client.get("/api/tags/1.json", format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
