@@ -18,6 +18,7 @@ class Article(models.Model):
     pages = models.IntegerField(blank=True, default=0)
     years = models.IntegerField(blank=True, default=0)
     url = models.CharField(max_length=500, blank=True, default="")
+    bibtext = models.TextField(blank=True, default='')
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     read_state = models.BooleanField(blank=True, default=False)
