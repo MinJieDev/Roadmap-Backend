@@ -17,7 +17,7 @@ class Article(models.Model):
     volume = models.IntegerField(blank=True, default=0)
     pages = models.IntegerField(blank=True, default=0)
     years = models.IntegerField(blank=True, default=0)
-    url = models.CharField(max_length=300, blank=True, default="")
+    url = models.CharField(max_length=500, blank=True, default="")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     read_state = models.BooleanField(blank=True, default=False)
