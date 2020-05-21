@@ -1,25 +1,25 @@
 import json
 import re
+from _sha256 import sha256 as sha256_func
+
 from django.http import HttpResponse, JsonResponse
-from rest_framework import viewsets, status, mixins, exceptions
-from rest_framework import authentication
+
+from rest_framework import authentication, exceptions, mixins, status, viewsets
 from rest_framework.generics import get_object_or_404
+from rest_framework.pagination import (CursorPagination, LimitOffsetPagination,
+                                       PageNumberPagination)
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
+from rest_framework_jwt.serializers import (jwt_encode_handler,
+                                            jwt_payload_handler)
 
-from . import models
-from . import serializers
-from rest_framework.response import Response
-
+from . import models, serializers
+from .models import Article, RoadMap, RoadMapShareId
+from .serializers import ArticleSerializer, RoadMapSerializer
 from .utils import UserModelViewSet
-
-from .models import RoadMapShareId, RoadMap, Article
-from _sha256 import sha256 as sha256_func
-
-from .serializers import RoadMapSerializer, ArticleSerializer
 
 
 class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
@@ -51,6 +51,7 @@ class ArticleViewSet(UserModelViewSet):
     queryset = models.Article.objects
     serializer_class = serializers.ArticleSerializer
     permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
 
 
 class EssayViewSet(UserModelViewSet):
