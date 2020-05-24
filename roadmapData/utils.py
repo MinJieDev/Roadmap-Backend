@@ -15,11 +15,15 @@ class UserRetrieveModelMixin(mixins.RetrieveModelMixin):
 
 
 class UserListModelMixin(mixins.ListModelMixin):
+    def paginate_queryset(self, queryset):
+        if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
+            return None
+        return super().paginate_queryset(queryset)
+
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         user = request.user
         queryset = queryset.filter(user=user)
-
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
