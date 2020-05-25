@@ -46,12 +46,14 @@ class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
     def perform_create(self, serializer):
         return serializer.save()
 
+
 class ArticlePagination(PageNumberPagination):
-    page_size = 10 
-    page_size_query_param = 'page_size' 
+    page_size = 10
+    page_size_query_param = 'page_size'
     page_query_param = 'page'
     max_page_size = 100
-    
+
+
 class ArticleViewSet(UserModelViewSet):
     queryset = models.Article.objects
     serializer_class = serializers.ArticleSerializer
@@ -128,3 +130,8 @@ class TagViewSet(UserModelViewSet):
     queryset = models.Tag.objects
     serializer_class = serializers.TagSerializer
     permission_classes = (IsAuthenticated,)
+
+
+class InterestsViewSet(UserModelViewSet):
+    queryset = models.Interests.objects
+    serializer_class = serializers.InterestsSerializer

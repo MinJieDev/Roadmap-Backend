@@ -12,6 +12,7 @@ class Article(models.Model):
     article_references = models.ManyToManyField("self", blank=True, symmetrical=False)
 
     title = models.CharField(max_length=200, blank=True, default='')
+    alias = models.CharField(max_length=200, blank=True, default='')
     author = models.TextField(blank=True, default='')
     journal = models.CharField(max_length=200, blank=True, default='')
     volume = models.IntegerField(blank=True, default=0)
@@ -59,3 +60,9 @@ class Tag(models.Model):
     essays = models.ManyToManyField(Essay, blank=True)
     roadmaps = models.ManyToManyField(RoadMap, blank=True)
     articles = models.ManyToManyField(Article, blank=True)
+
+
+class Interests(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    areas = models.TextField(blank=True, default='')
