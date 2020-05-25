@@ -51,3 +51,9 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Tag
         fields = '__all__'
+
+
+class InterestsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Interests
+        fields = '__all__'
