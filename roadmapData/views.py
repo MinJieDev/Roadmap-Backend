@@ -61,6 +61,11 @@ class ArticleViewSet(UserModelViewSet):
     pagination_class = ArticlePagination
 
 
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = models.Comment.objects
+    serializer_class = serializers.CommentSerializer
+
+
 class EssayViewSet(UserModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer
@@ -132,6 +137,11 @@ class TagViewSet(UserModelViewSet):
     permission_classes = (IsAuthenticated,)
 
 
-class InterestsViewSet(UserModelViewSet):
-    queryset = models.Interests.objects
-    serializer_class = serializers.InterestsSerializer
+class TermViewSet(viewsets.ModelViewSet):
+    queryset = models.Term.objects
+    serializer_class = serializers.TermSerializer
+
+
+class NewpaperViewSet(viewsets.ModelViewSet):
+    queryset = models.Newpaper.objects
+    serializer_class = serializers.NewpaperSerializer

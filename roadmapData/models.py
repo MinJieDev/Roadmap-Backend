@@ -6,6 +6,7 @@ class User(AbstractUser):
     email = models.CharField(max_length=255, default='')
     username = models.CharField(max_length=255, unique=True, default='')
     password = models.CharField(max_length=255, default='')
+    interest = models.TextField(blank=True, default='')
 
 
 class Article(models.Model):
@@ -26,8 +27,14 @@ class Article(models.Model):
     note = models.TextField(blank=True, default='')
 
 
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(blank=True, default='')
+
+
 class Essay(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    comments = models.ManyToManyField(Comment, blank=True)
 
     title = models.CharField(max_length=200, blank=True, default='')
     text = models.TextField(blank=True, default='')
@@ -38,6 +45,7 @@ class RoadMap(models.Model):
     road_maps = models.ManyToManyField("self", blank=True, symmetrical=False)
     articles = models.ManyToManyField(Article, blank=True)
     essays = models.ManyToManyField(Essay, blank=True)
+    comments = models.ManyToManyField(Comment, blank=True)
 
     title = models.CharField(max_length=200, blank=True, default='')
     text = models.TextField(blank=True, default='')
@@ -62,7 +70,10 @@ class Tag(models.Model):
     articles = models.ManyToManyField(Article, blank=True)
 
 
-class Interests(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+class Term(models.Model):
+    name = models.TextField(blank=True, default='')
 
-    areas = models.TextField(blank=True, default='')
+
+class Newpaper(models.Model):
+    term = models.ManyToManyField(Term, blank=True)
+    text = models.TextField(blank=True, default='')

@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
 from . import models
 
@@ -7,7 +6,7 @@ from . import models
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('id', 'email', 'username', 'password')
+        fields = ('id', 'email', 'username', 'password', 'interest')
 
     def create(self, validated_data):
         user = super(UserSerializer, self).create(validated_data=validated_data)
@@ -19,6 +18,12 @@ class UserSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Article
+        fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Comment
         fields = '__all__'
 
 
@@ -38,7 +43,7 @@ class RoadMapViewSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.RoadMap
         fields = ('id', 'title', 'description',
-                  'user', 'articles', 'essays', 'road_maps')
+                  'user', 'articles', 'essays', 'road_maps', 'comments')
 
 
 class FeedbackSerializer(serializers.ModelSerializer):
@@ -53,7 +58,13 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class InterestsSerializer(serializers.ModelSerializer):
+class TermSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Interests
+        model = models.Term
+        fields = '__all__'
+
+
+class NewpaperSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Newpaper
         fields = '__all__'

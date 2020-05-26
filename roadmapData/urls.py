@@ -11,11 +11,13 @@ from .views import CreateOrGetRoadMapShareIdView, GetSharedRoadMapView
 router = DefaultRouter()
 router.register('users', views.UserViewSet, basename='users')
 router.register('articles', views.ArticleViewSet, basename='articles')
+router.register('comments', views.CommentViewSet, basename='comments')
 router.register('essays', views.EssayViewSet, basename='essays')
 router.register('road_maps', views.RoadMapViewSet, basename='road_maps')
 router.register('feedback', views.FeedbackViewSet, basename='feedback')
 router.register('tags', views.TagViewSet, basename='tags')
-router.register('interests', views.InterestsViewSet, basename='interests')
+router.register('terms', views.TermViewSet, basename='terms')
+router.register('newpapers', views.NewpaperViewSet, basename='newpapers')
 
 urlpatterns = [
     path('', include(router.urls)),
