@@ -16,7 +16,19 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Tag
+        fields = '__all__'
+
+
 class ArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Article
+        fields = '__all__'
+
+class ArticleRecursiveSerializer(serializers.ModelSerializer):
+    tag = TagSerializer(read_only=True, many=True)
     class Meta:
         model = models.Article
         fields = '__all__'
@@ -28,7 +40,21 @@ class EssaySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class EssayRecursiveSerializer(serializers.ModelSerializer):
+    tag = TagSerializer(read_only=True, many=True)
+    class Meta:
+        model = models.Essay
+        fields = '__all__'
+
+
 class RoadMapSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.RoadMap
+        fields = '__all__'
+
+
+class RoadMapRecursiveSerializer(serializers.ModelSerializer):
+    tag = TagSerializer(read_only=True, many=True)
     class Meta:
         model = models.RoadMap
         fields = '__all__'
@@ -47,8 +73,4 @@ class FeedbackSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Tag
-        fields = '__all__'
 

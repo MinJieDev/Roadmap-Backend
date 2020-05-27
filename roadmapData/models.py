@@ -9,6 +9,11 @@ class User(AbstractUser):
     interest = models.TextField(blank=True, default='')
 
 
+class Tag(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, blank=True, default='')
+
+
 class Article(models.Model):
     article_references = models.ManyToManyField("self", blank=True, symmetrical=False)
 
@@ -25,6 +30,7 @@ class Article(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     read_state = models.BooleanField(blank=True, default=False)
     note = models.TextField(blank=True, default='')
+    tag = models.ManyToManyField(Tag, blank=True)
 
 
 class Essay(models.Model):
@@ -35,6 +41,7 @@ class Essay(models.Model):
     abstract = models.TextField(blank=True, default='')
     text = models.TextField(blank=True, default='')
     state = models.BooleanField(blank=True, default=False)
+    tag = models.ManyToManyField(Tag, blank=True)
 
 
 class RoadMap(models.Model):
@@ -46,6 +53,7 @@ class RoadMap(models.Model):
     title = models.CharField(max_length=200, blank=True, default='')
     text = models.TextField(blank=True, default='')
     description = models.TextField(blank=True, default='')
+    tag = models.ManyToManyField(Tag, blank=True)
 
 
 class RoadMapShareId(models.Model):
@@ -57,10 +65,3 @@ class Feedback(models.Model):
     text = models.TextField(default='')
 
 
-class Tag(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=200, blank=True, default='')
-
-    essays = models.ManyToManyField(Essay, blank=True)
-    roadmaps = models.ManyToManyField(RoadMap, blank=True)
-    articles = models.ManyToManyField(Article, blank=True)
