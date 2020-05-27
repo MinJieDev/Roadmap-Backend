@@ -57,7 +57,8 @@ class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
     def update(self, request, *args, **kwargs):
         user = request.user
         instance = self.get_object()
-
+        if instance.username != user.username:
+            raise exceptions.PermissionDenied()
         data = request.data
         data['user'] = request.user.id
 
