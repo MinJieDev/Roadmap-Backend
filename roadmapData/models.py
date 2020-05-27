@@ -6,6 +6,7 @@ class User(AbstractUser):
     email = models.CharField(max_length=255, default='')
     username = models.CharField(max_length=255, unique=True, default='')
     password = models.CharField(max_length=255, default='')
+    interest = models.TextField(blank=True, default='')
 
 
 class Article(models.Model):
@@ -60,9 +61,3 @@ class Tag(models.Model):
     essays = models.ManyToManyField(Essay, blank=True)
     roadmaps = models.ManyToManyField(RoadMap, blank=True)
     articles = models.ManyToManyField(Article, blank=True)
-
-
-class Interests(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    areas = models.TextField(blank=True, default='')

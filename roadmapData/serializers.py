@@ -7,7 +7,7 @@ from . import models
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('id', 'email', 'username', 'password')
+        fields = ('id', 'email', 'username', 'password', 'interest')
 
     def create(self, validated_data):
         user = super(UserSerializer, self).create(validated_data=validated_data)
@@ -52,8 +52,3 @@ class TagSerializer(serializers.ModelSerializer):
         model = models.Tag
         fields = '__all__'
 
-
-class InterestsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Interests
-        fields = '__all__'
