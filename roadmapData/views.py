@@ -61,10 +61,10 @@ class ArticleViewSet(UserModelViewSet):
     pagination_class = ArticlePagination
 
 
-class EssayViewSet(UserModelViewSet):
+class EssayViewSet(viewsets.ModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer
-    permission_classes = (IsAuthenticated,)
+    #permission_classes = (IsAuthenticated,)
 
 
 class RoadMapViewSet(UserModelViewSet):
