@@ -35,6 +35,8 @@ class Essay(models.Model):
     abstract = models.TextField(blank=True, default='')
     text = models.TextField(blank=True, default='')
     state = models.BooleanField(blank=True, default=False)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
 
 class RoadMap(models.Model):
@@ -46,6 +48,8 @@ class RoadMap(models.Model):
     title = models.CharField(max_length=200, blank=True, default='')
     text = models.TextField(blank=True, default='')
     description = models.TextField(blank=True, default='')
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
 
 class RoadMapShareId(models.Model):
