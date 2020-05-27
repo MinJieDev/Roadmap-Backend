@@ -17,13 +17,14 @@ from rest_framework_jwt.serializers import (jwt_encode_handler,
                                             jwt_payload_handler)
 
 from . import models, serializers
-from .models import Article, RoadMap, RoadMapShareId, Newpaper
+from .models import Article, RoadMap, RoadMapShareId, User, Newpaper
 from .serializers import ArticleSerializer, RoadMapSerializer
-from .utils import UserModelViewSet
+from .utils import UserModelViewSet, UserListModelMixin
 
 
 class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
-                  GenericViewSet):
+                  GenericViewSet,
+                  mixins.UpdateModelMixin):
     queryset = models.User.objects
     serializer_class = serializers.UserSerializer
 
@@ -46,8 +47,33 @@ class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
     def perform_create(self, serializer):
         return serializer.save()
 
+    def list(self, request, *args, **kwargs):
+        queryset = User.objects
+        user = request.user
+        queryset = queryset.filter(username=user)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-class ArticlePagination(PageNumberPagination):
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        instance = self.get_object()
+        if instance.username != user.username:
+            raise exceptions.PermissionDenied()
+        data = request.data
+        data['user'] = request.user.id
+
+        partial = kwargs.pop('partial', False)
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+
+
+class UserDefinePagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     page_query_param = 'page'
@@ -58,20 +84,20 @@ class ArticleViewSet(UserModelViewSet):
     queryset = models.Article.objects
     serializer_class = serializers.ArticleSerializer
     permission_classes = (IsAuthenticated,)
-    pagination_class = ArticlePagination
+    pagination_class = UserDefinePagination
 
 
 class EssayViewSet(UserModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer
     permission_classes = (IsAuthenticated,)
-
+    pagination_class = UserDefinePagination
 
 class RoadMapViewSet(UserModelViewSet):
     queryset = models.RoadMap.objects
     serializer_class = serializers.RoadMapSerializer
     permission_classes = (IsAuthenticated,)
-
+    pagination_class = UserDefinePagination
 
 class GetSharedRoadMapView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')

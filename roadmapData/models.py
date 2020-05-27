@@ -31,7 +31,10 @@ class Essay(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     title = models.CharField(max_length=200, blank=True, default='')
+    author = models.CharField(max_length=200, blank=True, default='')
+    abstract = models.TextField(blank=True, default='')
     text = models.TextField(blank=True, default='')
+    state = models.BooleanField(blank=True, default=False)
 
 
 class RoadMap(models.Model):
