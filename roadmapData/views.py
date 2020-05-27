@@ -47,7 +47,7 @@ class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
         return serializer.save()
 
 
-class ArticlePagination(PageNumberPagination):
+class UserDefinePagination(PageNumberPagination):
     page_size = 10
     page_size_query_param = 'page_size'
     page_query_param = 'page'
@@ -58,20 +58,20 @@ class ArticleViewSet(UserModelViewSet):
     queryset = models.Article.objects
     serializer_class = serializers.ArticleSerializer
     permission_classes = (IsAuthenticated,)
-    pagination_class = ArticlePagination
+    pagination_class = UserDefinePagination
 
 
 class EssayViewSet(UserModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer
     permission_classes = (IsAuthenticated,)
-
+    pagination_class = UserDefinePagination
 
 class RoadMapViewSet(UserModelViewSet):
     queryset = models.RoadMap.objects
     serializer_class = serializers.RoadMapSerializer
     permission_classes = (IsAuthenticated,)
-
+    pagination_class = UserDefinePagination
 
 class GetSharedRoadMapView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
