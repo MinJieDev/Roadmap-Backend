@@ -42,6 +42,8 @@ class Essay(models.Model):
     text = models.TextField(blank=True, default='')
     state = models.BooleanField(blank=True, default=False)
     tag = models.ManyToManyField(Tag, blank=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
 
 class RoadMap(models.Model):
@@ -54,6 +56,8 @@ class RoadMap(models.Model):
     text = models.TextField(blank=True, default='')
     description = models.TextField(blank=True, default='')
     tag = models.ManyToManyField(Tag, blank=True)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
 
 
 class RoadMapShareId(models.Model):
@@ -65,3 +69,19 @@ class Feedback(models.Model):
     text = models.TextField(default='')
 
 
+class Tag(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200, blank=True, default='')
+
+    essays = models.ManyToManyField(Essay, blank=True)
+    roadmaps = models.ManyToManyField(RoadMap, blank=True)
+    articles = models.ManyToManyField(Article, blank=True)
+
+
+class Term(models.Model):
+    name = models.CharField(max_length=200, blank=True, default='')
+
+
+class Newpaper(models.Model):
+    term = models.ManyToManyField(Term, blank=True)
+    text = models.TextField(blank=True, default='')

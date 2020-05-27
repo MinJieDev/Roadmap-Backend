@@ -17,13 +17,19 @@ from rest_framework_jwt.serializers import (jwt_encode_handler,
                                             jwt_payload_handler)
 
 from . import models, serializers
+
 from .models import Article, RoadMap, RoadMapShareId
 from .serializers import ArticleSerializer, RoadMapSerializer, RoadMapRecursiveSerializer, RoadMapSerializer, ArticleRecursiveSerializer, EssayRecursiveSerializer
 from .utils import UserModelViewSet
 
+from .models import Article, RoadMap, RoadMapShareId, User, Newpaper
+from .serializers import ArticleSerializer, RoadMapSerializer
+from .utils import UserModelViewSet, UserListModelMixin
+
 
 class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
-                  GenericViewSet):
+                  GenericViewSet,
+                  mixins.UpdateModelMixin):
     queryset = models.User.objects
     serializer_class = serializers.UserSerializer
 
@@ -45,6 +51,31 @@ class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
 
     def perform_create(self, serializer):
         return serializer.save()
+
+    def list(self, request, *args, **kwargs):
+        queryset = User.objects
+        user = request.user
+        queryset = queryset.filter(username=user)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        instance = self.get_object()
+        if instance.username != user.username:
+            raise exceptions.PermissionDenied()
+        data = request.data
+        data['user'] = request.user.id
+
+        partial = kwargs.pop('partial', False)
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
 
 
 class UserDefinePagination(PageNumberPagination):
@@ -212,3 +243,23 @@ class TagViewSet(UserModelViewSet):
             serializer.data[i]['road_maps'] = road_map_list
           
         return Response(serializer.data)
+
+class TermViewSet(viewsets.ModelViewSet):
+    queryset = models.Term.objects
+    serializer_class = serializers.TermSerializer
+
+
+class NewpaperViewSet(viewsets.ModelViewSet):
+    queryset = models.Newpaper.objects
+    serializer_class = serializers.NewpaperSerializer
+
+
+class GetNewpaperView(APIView):
+    def get(self, request, interest):
+        term = models.Term.objects.get(name=interest)
+        newpapers = Newpaper.objects.filter(term=term.id).all()
+        data =[]
+        for newpaper in newpapers:
+            serializer = serializers.NewpaperSerializer(newpaper)
+            data.append(serializer.data)
+        return Response(data)
