@@ -17,7 +17,7 @@ from rest_framework_jwt.serializers import (jwt_encode_handler,
                                             jwt_payload_handler)
 
 from . import models, serializers
-from .models import Article, RoadMap, RoadMapShareId
+from .models import Article, RoadMap, RoadMapShareId, Newpaper
 from .serializers import ArticleSerializer, RoadMapSerializer
 from .utils import UserModelViewSet
 
@@ -140,3 +140,14 @@ class TermViewSet(viewsets.ModelViewSet):
 class NewpaperViewSet(viewsets.ModelViewSet):
     queryset = models.Newpaper.objects
     serializer_class = serializers.NewpaperSerializer
+
+
+class GetNewpaperView(APIView):
+    def get(self, request, interest):
+        term = models.Term.objects.get(name=interest)
+        newpapers = Newpaper.objects.filter(term=term.id).all()
+        data =[]
+        for newpaper in newpapers:
+            serializer = serializers.NewpaperSerializer(newpaper)
+            data.append(serializer.data)
+        return Response(data)
