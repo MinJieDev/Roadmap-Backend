@@ -17,6 +17,11 @@ from rest_framework_jwt.serializers import (jwt_encode_handler,
                                             jwt_payload_handler)
 
 from . import models, serializers
+
+from .models import Article, RoadMap, RoadMapShareId
+from .serializers import ArticleSerializer, RoadMapSerializer, RoadMapRecursiveSerializer, RoadMapSerializer, ArticleRecursiveSerializer, EssayRecursiveSerializer
+from .utils import UserModelViewSet
+
 from .models import Article, RoadMap, RoadMapShareId, User, Newpaper
 from .serializers import ArticleSerializer, RoadMapSerializer
 from .utils import UserModelViewSet, UserListModelMixin
@@ -86,18 +91,71 @@ class ArticleViewSet(UserModelViewSet):
     permission_classes = (IsAuthenticated,)
     pagination_class = UserDefinePagination
 
+    def paginate_queryset(self, queryset):
+        if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
+            return None
+        return super().paginate_queryset(queryset)
+
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        user = request.user
+        queryset = queryset.filter(user=user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ArticleRecursiveSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = ArticleRecursiveSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class EssayViewSet(UserModelViewSet):
     queryset = models.Essay.objects
     serializer_class = serializers.EssaySerializer
     permission_classes = (IsAuthenticated,)
     pagination_class = UserDefinePagination
+    
+    def paginate_queryset(self, queryset):
+        if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
+            return None
+        return super().paginate_queryset(queryset)
+
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        user = request.user
+        queryset = queryset.filter(user=user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = EssayRecursiveSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = EssayRecursiveSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class RoadMapViewSet(UserModelViewSet):
     queryset = models.RoadMap.objects
     serializer_class = serializers.RoadMapSerializer
     permission_classes = (IsAuthenticated,)
     pagination_class = UserDefinePagination
+
+    def paginate_queryset(self, queryset):
+        if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
+            return None
+        return super().paginate_queryset(queryset)
+
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        user = request.user
+        queryset = queryset.filter(user=user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = RoadMapRecursiveSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = RoadMapRecursiveSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class GetSharedRoadMapView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
@@ -157,6 +215,34 @@ class TagViewSet(UserModelViewSet):
     serializer_class = serializers.TagSerializer
     permission_classes = (IsAuthenticated,)
 
+    def paginate_queryset(self, queryset):
+        if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
+            return None
+        return super().paginate_queryset(queryset)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        user = request.user
+        queryset = queryset.filter(user=user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        for i in range(len(serializer.data)):
+            article_query = queryset[i].article_set.all()
+            article_list = [j.id for j in article_query]
+            essay_query = queryset[i].essay_set.all()
+            essay_list = [j.id for j in essay_query]
+            road_map_query = queryset[i].roadmap_set.all()
+            road_map_list = [j.id for j in road_map_query]
+  
+            serializer.data[i]['articles'] = article_list
+            serializer.data[i]['essays'] = essay_list
+            serializer.data[i]['road_maps'] = road_map_list
+          
+        return Response(serializer.data)
 
 class TermViewSet(viewsets.ModelViewSet):
     queryset = models.Term.objects
