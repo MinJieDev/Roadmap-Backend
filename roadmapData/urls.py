@@ -15,6 +15,8 @@ router.register('essays', views.EssayViewSet, basename='essays')
 router.register('road_maps', views.RoadMapViewSet, basename='road_maps')
 router.register('feedback', views.FeedbackViewSet, basename='feedback')
 router.register('tags', views.TagViewSet, basename='tags')
+router.register('terms', views.TermViewSet, basename='terms')
+router.register('newpapers', views.NewpaperViewSet, basename='newpapers')
 
 urlpatterns = [
     path('', include(router.urls)),

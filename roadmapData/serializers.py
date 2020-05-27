@@ -52,3 +52,14 @@ class TagSerializer(serializers.ModelSerializer):
         model = models.Tag
         fields = '__all__'
 
+
+class TermSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Term
+        fields = '__all__'
+
+
+class NewpaperSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Newpaper
+        fields = '__all__'

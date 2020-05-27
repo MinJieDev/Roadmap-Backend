@@ -130,3 +130,13 @@ class TagViewSet(UserModelViewSet):
     queryset = models.Tag.objects
     serializer_class = serializers.TagSerializer
     permission_classes = (IsAuthenticated,)
+
+
+class TermViewSet(viewsets.ModelViewSet):
+    queryset = models.Term.objects
+    serializer_class = serializers.TermSerializer
+
+
+class NewpaperViewSet(viewsets.ModelViewSet):
+    queryset = models.Newpaper.objects
+    serializer_class = serializers.NewpaperSerializer
