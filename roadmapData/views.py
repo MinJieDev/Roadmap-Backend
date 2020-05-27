@@ -130,8 +130,3 @@ class TagViewSet(UserModelViewSet):
     queryset = models.Tag.objects
     serializer_class = serializers.TagSerializer
     permission_classes = (IsAuthenticated,)
-
-
-class InterestsViewSet(UserModelViewSet):
-    queryset = models.Interests.objects
-    serializer_class = serializers.InterestsSerializer
