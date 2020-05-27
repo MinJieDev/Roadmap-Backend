@@ -64,3 +64,12 @@ class Tag(models.Model):
     essays = models.ManyToManyField(Essay, blank=True)
     roadmaps = models.ManyToManyField(RoadMap, blank=True)
     articles = models.ManyToManyField(Article, blank=True)
+
+
+class Term(models.Model):
+    name = models.CharField(max_length=200, blank=True, default='')
+
+
+class Newpaper(models.Model):
+    term = models.ManyToManyField(Term, blank=True)
+    text = models.TextField(blank=True, default='')

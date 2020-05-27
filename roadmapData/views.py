@@ -17,7 +17,7 @@ from rest_framework_jwt.serializers import (jwt_encode_handler,
                                             jwt_payload_handler)
 
 from . import models, serializers
-from .models import Article, RoadMap, RoadMapShareId, User
+from .models import Article, RoadMap, RoadMapShareId, User, Newpaper
 from .serializers import ArticleSerializer, RoadMapSerializer
 from .utils import UserModelViewSet, UserListModelMixin
 
@@ -156,3 +156,24 @@ class TagViewSet(UserModelViewSet):
     queryset = models.Tag.objects
     serializer_class = serializers.TagSerializer
     permission_classes = (IsAuthenticated,)
+
+
+class TermViewSet(viewsets.ModelViewSet):
+    queryset = models.Term.objects
+    serializer_class = serializers.TermSerializer
+
+
+class NewpaperViewSet(viewsets.ModelViewSet):
+    queryset = models.Newpaper.objects
+    serializer_class = serializers.NewpaperSerializer
+
+
+class GetNewpaperView(APIView):
+    def get(self, request, interest):
+        term = models.Term.objects.get(name=interest)
+        newpapers = Newpaper.objects.filter(term=term.id).all()
+        data =[]
+        for newpaper in newpapers:
+            serializer = serializers.NewpaperSerializer(newpaper)
+            data.append(serializer.data)
+        return Response(data)
