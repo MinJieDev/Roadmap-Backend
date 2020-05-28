@@ -102,11 +102,18 @@ class ArticleViewSet(UserModelViewSet):
         user = request.user
         queryset = queryset.filter(user=user)
         page = self.paginate_queryset(queryset)
+      
+        serializer = ArticleRecursiveSerializer(queryset, many=True)
         if page is not None:
             serializer = ArticleRecursiveSerializer(page, many=True)
+            
+        for i in range(len(serializer.data)):
+            road_map_query = queryset[i].roadmap_set.all()
+            road_map_list = [j.id for j in road_map_query]
+            serializer.data[i]['road_maps'] = road_map_list
+            
+        if (page is not None):
             return self.get_paginated_response(serializer.data)
-
-        serializer = ArticleRecursiveSerializer(queryset, many=True)
         return Response(serializer.data)
 
 class EssayViewSet(UserModelViewSet):
