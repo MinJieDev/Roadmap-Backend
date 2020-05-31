@@ -270,3 +270,8 @@ class GetNewpaperView(APIView):
             serializer = serializers.NewpaperSerializer(newpaper)
             data.append(serializer.data)
         return Response(data)
+
+class CommentViewSet(UserModelViewSet):
+    queryset = models.Comment.objects
+    serializer_class = serializers.CommentSerializer
+    permission_classes = (IsAuthenticated,)

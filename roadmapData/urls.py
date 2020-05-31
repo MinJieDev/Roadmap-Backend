@@ -17,6 +17,7 @@ router.register('feedback', views.FeedbackViewSet, basename='feedback')
 router.register('tags', views.TagViewSet, basename='tags')
 router.register('terms', views.TermViewSet, basename='terms')
 router.register('newpapers', views.NewpaperViewSet, basename='newpapers')
+router.register('comments', views.CommentViewSet, basename='comments')
 
 urlpatterns = [
     path('', include(router.urls)),
