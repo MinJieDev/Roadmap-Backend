@@ -16,6 +16,11 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class UserViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        fields = ('id', 'username')
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Tag
@@ -47,7 +52,7 @@ class EssayRecursiveSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserViewSerializer()
     class Meta:
         model = models.Comment
         fields = '__all__'
