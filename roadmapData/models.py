@@ -7,6 +7,9 @@ class User(AbstractUser):
     username = models.CharField(max_length=255, unique=True, default='')
     password = models.CharField(max_length=255, default='')
     interest = models.TextField(blank=True, default='')
+    city = models.CharField(max_length=300, default='')
+    organization = models.CharField(max_length=300, default='')
+    bio = models.CharField(max_length=300, default='')
 
 
 class Tag(models.Model):
@@ -15,7 +18,9 @@ class Tag(models.Model):
 
 
 class Article(models.Model):
-    article_references = models.ManyToManyField("self", blank=True, symmetrical=False)
+    READ_STATE_CHOICES = (('U', 'unread'),
+                          ('I', 'reading'),
+                          ('F', 'read'))
 
     title = models.CharField(max_length=200, blank=True, default='')
     alias = models.CharField(max_length=200, blank=True, default='')
@@ -28,26 +33,34 @@ class Article(models.Model):
     bibtext = models.TextField(blank=True, default='')
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    read_state = models.BooleanField(blank=True, default=False)
+    article_references = models.ManyToManyField("self", blank=True, symmetrical=False)
+    read_state = models.CharField(max_length=1, blank=True, choices=READ_STATE_CHOICES, default='U')
     note = models.TextField(blank=True, default='')
     tag = models.ManyToManyField(Tag, blank=True)
+
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField(blank=True, default='')
 
+
 class Essay(models.Model):
+    STATE_CHOICES = (('U', 'unfinished'),
+                     ('I', 'writing'),
+                     ('F', 'finished'))
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     title = models.CharField(max_length=200, blank=True, default='')
     author = models.CharField(max_length=200, blank=True, default='')
     abstract = models.TextField(blank=True, default='')
     text = models.TextField(blank=True, default='')
-    state = models.BooleanField(blank=True, default=False)
+    state = models.CharField(max_length=1, blank=True, choices=STATE_CHOICES, default='U')
     tag = models.ManyToManyField(Tag, blank=True)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
     comment = models.ManyToManyField(Comment, blank=True)
+
 
 class RoadMap(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -80,4 +93,3 @@ class Term(models.Model):
 class Newpaper(models.Model):
     term = models.ManyToManyField(Term, blank=True)
     text = models.TextField(blank=True, default='')
-
