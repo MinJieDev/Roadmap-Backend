@@ -251,6 +251,20 @@ class TagViewSet(UserModelViewSet):
           
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        data['user'] = request.user.id
+
+        queryset = self.filter_queryset(self.get_queryset()).filter(user=data['user'],name=data['name'])
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        if (len(queryset) == 0):
+            self.perform_create(serializer)
+        else:
+            serializer = self.get_serializer(queryset[0])
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 class TermViewSet(viewsets.ModelViewSet):
     queryset = models.Term.objects
     serializer_class = serializers.TermSerializer
