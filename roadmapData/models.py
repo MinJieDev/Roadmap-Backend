@@ -34,7 +34,7 @@ class Article(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article_references = models.ManyToManyField("self", blank=True, symmetrical=False)
-    read_state = models.CharField(max_length=1, blank=True, choices=READ_STATE_CHOICES, default='U')
+    read_state = models.CharField(max_length=1, choices=READ_STATE_CHOICES, default='U')
     note = models.TextField(blank=True, default='')
     tag = models.ManyToManyField(Tag, blank=True)
 
@@ -55,7 +55,7 @@ class Essay(models.Model):
     author = models.CharField(max_length=200, blank=True, default='')
     abstract = models.TextField(blank=True, default='')
     text = models.TextField(blank=True, default='')
-    state = models.CharField(max_length=1, blank=True, choices=STATE_CHOICES, default='U')
+    state = models.CharField(max_length=1, choices=STATE_CHOICES, default='U')
     tag = models.ManyToManyField(Tag, blank=True)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
