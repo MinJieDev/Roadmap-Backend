@@ -46,6 +46,11 @@ class EssayRecursiveSerializer(serializers.ModelSerializer):
         model = models.Essay
         fields = '__all__'
 
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = models.Comment
+        fields = '__all__'
 
 class RoadMapSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,6 +60,7 @@ class RoadMapSerializer(serializers.ModelSerializer):
 
 class RoadMapRecursiveSerializer(serializers.ModelSerializer):
     tag = TagSerializer(read_only=True, many=True)
+    comment = CommentSerializer(read_only=True, many=True)
     class Meta:
         model = models.RoadMap
         fields = '__all__'
@@ -87,7 +93,3 @@ class NewpaperSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Comment
-        fields = '__all__'
