@@ -7,7 +7,8 @@ from . import models
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
-        fields = ('id', 'email', 'username', 'password', 'interest')
+        fields = ('id', 'email', 'username', 'password',
+                  'interest', 'city', 'organization', 'bio')
 
     def create(self, validated_data):
         user = super(UserSerializer, self).create(validated_data=validated_data)
@@ -32,8 +33,10 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = models.Article
         fields = '__all__'
 
+
 class ArticleRecursiveSerializer(serializers.ModelSerializer):
     tag = TagSerializer(read_only=True, many=True)
+
     class Meta:
         model = models.Article
         fields = '__all__'
@@ -56,6 +59,14 @@ class EssayRecursiveSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Essay
         fields = '__all__'
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = UserViewSerializer()
+    class Meta:
+        model = models.Comment
+        fields = '__all__'
+
 
 class RoadMapSerializer(serializers.ModelSerializer):
     class Meta:
@@ -82,8 +93,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Feedback
         fields = '__all__'
-
-
 
 
 class TermSerializer(serializers.ModelSerializer):
