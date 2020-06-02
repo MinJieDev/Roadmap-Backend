@@ -184,6 +184,15 @@ class RoadMapViewSet(UserModelViewSet):
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+        if instance.user != user:
+            raise exceptions.PermissionDenied()
+
+        serializer = serializers.RoadMapRecursiveSerializer(instance)
+        return Response(serializer.data)
     
 
 class GetSharedRoadMapView(APIView):
