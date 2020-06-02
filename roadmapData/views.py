@@ -333,14 +333,23 @@ class CommentViewSet(UserModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = serializers.CommentViewSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = serializers.CommentViewSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
 
-        serializer = self.get_serializer(instance)
+        serializer = serializers.CommentViewSerializer(instance)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        data['user'] = request.user.id
+        serializer = serializers.CommentSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

@@ -47,8 +47,13 @@ class EssaySerializer(serializers.ModelSerializer):
         model = models.Essay
         fields = '__all__'
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentViewSerializer(serializers.ModelSerializer):
     user = UserViewSerializer()
+    class Meta:
+        model = models.Comment
+        fields = '__all__'
+
+class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Comment
         fields = '__all__'
@@ -59,14 +64,6 @@ class EssayRecursiveSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Essay
         fields = '__all__'
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    user = UserViewSerializer()
-    class Meta:
-        model = models.Comment
-        fields = '__all__'
-
 
 class RoadMapSerializer(serializers.ModelSerializer):
     class Meta:
