@@ -6,7 +6,8 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify
 
 from . import views
 
-from .views import CreateOrGetRoadMapShareIdView, GetSharedRoadMapView, GetSharedEssayView, GetNewpaperView, CreateOrGetEssayShareIdView
+from .views import CreateOrGetRoadMapShareIdView, GetSharedRoadMapView, GetSharedEssayView, GetNewpaperView, \
+    CreateOrGetEssayShareIdView, RoadMapPutLikeView
 
 router = DefaultRouter()
 router.register('users', views.UserViewSet, basename='users')
@@ -20,6 +21,7 @@ router.register('newpapers', views.NewpaperViewSet, basename='newpapers')
 router.register('comments', views.CommentViewSet, basename='comments')
 
 urlpatterns = [
+    path('roadmap_like/<str:map_sha256>/', RoadMapPutLikeView.as_view()),
     path('', include(router.urls)),
     path('docs/', include_docs_urls(title='api', public=False)),
     path('login/', obtain_jwt_token),

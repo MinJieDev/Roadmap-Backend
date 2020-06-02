@@ -38,9 +38,6 @@ class Article(models.Model):
     note = models.TextField(blank=True, default='')
     tag = models.ManyToManyField(Tag, blank=True)
 
-class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField(blank=True, default='')
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -63,6 +60,7 @@ class Essay(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
     comment = models.ManyToManyField(Comment, blank=True)
+    like = models.ManyToManyField(User, blank=True, related_name='like_essay')
 
 
 class RoadMap(models.Model):
@@ -78,11 +76,13 @@ class RoadMap(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
     comment = models.ManyToManyField(Comment, blank=True)
+    like = models.ManyToManyField(User, blank=True, related_name='like_roadmap')
 
 
 class RoadMapShareId(models.Model):
     roadmap = models.ForeignKey(RoadMap, on_delete=models.CASCADE)
     sha256 = models.CharField(max_length=64)
+
 
 class EssayShareId(models.Model):
     essay = models.ForeignKey(Essay, on_delete=models.CASCADE)
@@ -100,4 +100,3 @@ class Term(models.Model):
 class Newpaper(models.Model):
     term = models.ManyToManyField(Term, blank=True)
     text = models.TextField(blank=True, default='')
-
