@@ -140,6 +140,15 @@ class EssayViewSet(UserModelViewSet):
         serializer = EssayRecursiveSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+        if instance.user != user:
+            raise exceptions.PermissionDenied()
+
+        serializer = serializers.EssayRecursiveSerializer(instance)
+        return Response(serializer.data)
+
 class RoadMapViewSet(UserModelViewSet):
     queryset = models.RoadMap.objects
     serializer_class = serializers.RoadMapSerializer
@@ -183,6 +192,15 @@ class RoadMapViewSet(UserModelViewSet):
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
+        return Response(serializer.data)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+        if instance.user != user:
+            raise exceptions.PermissionDenied()
+
+        serializer = serializers.RoadMapRecursiveSerializer(instance)
         return Response(serializer.data)
     
 
