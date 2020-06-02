@@ -164,6 +164,28 @@ class RoadMapViewSet(UserModelViewSet):
         serializer = RoadMapRecursiveSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    def update(self, request, *args, **kwargs):
+        user = request.user
+        instance = self.get_object()
+        data = request.data
+        
+        if instance.user != user and not (len(data) == 1 and list(data.keys())[0] == 'comment'):
+            raise exceptions.PermissionDenied()
+
+        data['user'] = RoadMapSerializer(instance).data['user']
+        partial = kwargs.pop('partial', False)
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+    
+
 class GetSharedRoadMapView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
 
