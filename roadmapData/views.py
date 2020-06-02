@@ -140,6 +140,14 @@ class EssayViewSet(UserModelViewSet):
         serializer = EssayRecursiveSerializer(queryset, many=True)
         return Response(serializer.data)
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+        if instance.user != user:
+            raise exceptions.PermissionDenied()
+
+        serializer = serializers.EssayRecursiveSerializer(instance)
+        return Response(serializer.data)
 
 class RoadMapViewSet(UserModelViewSet):
     queryset = models.RoadMap.objects
@@ -185,13 +193,22 @@ class RoadMapViewSet(UserModelViewSet):
 
         return Response(serializer.data)
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = request.user
+        if instance.user != user:
+            raise exceptions.PermissionDenied()
+
+        serializer = serializers.RoadMapRecursiveSerializer(instance)
+        return Response(serializer.data)
+    
 
 class GetSharedRoadMapView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
 
     def get(self, request, map_sha256):
         roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
-        serializer = RoadMapSerializer(roadmap)
+        serializer = RoadMapRecursiveSerializer(roadmap)
         data = serializer.data
         roadmap_meta = json.loads(data['text'])
         nodes = roadmap_meta.get('nodes', [])
@@ -219,7 +236,7 @@ class GetSharedRoadMapView(APIView):
 class GetSharedEssayView(APIView):
     def get(self, request, map_sha256):
         essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
-        serializer = EssaySerializer(essay)
+        serializer = EssayRecursiveSerializer(essay)
         data = serializer.data
         essay_meta = json.loads(data['text'])
         refRoadmap = essay_meta.get('refRoadmap', '')
@@ -232,6 +249,7 @@ class GetSharedEssayView(APIView):
 
 class CreateOrGetRoadMapShareIdView(APIView):
     def post(self, request):
+        print("a")
         try:
             road_map_id = json.loads(request.body)['id']
         except:
@@ -253,7 +271,41 @@ class CreateOrGetRoadMapShareIdView(APIView):
         record.save()
         return Response({'share_id': sha256})
 
+class RoadMapPutCommentView(APIView):
+    ARTICLE_REG = re.compile(r'^\$(\d+)$')
 
+    def put(self, request, map_sha256):
+        roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
+        serializer = RoadMapSerializer(roadmap)
+        data = serializer.data
+        comment_ori = data['comment']
+        
+        query_set = models.RoadMap.objects
+        query_set = query_set.filter(id=data['id'])
+        comment = comment_ori + [int(request.data['comment'])]
+        print(comment)
+        query_set[0].comment.set(comment)
+        query_set[0].save()
+       
+        return Response(RoadMapSerializer(query_set[0]).data)
+
+class EssayPutCommentView(APIView):
+    ARTICLE_REG = re.compile(r'^\$(\d+)$')
+
+    def put(self, request, map_sha256):
+        essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
+        serializer = EssaySerializer(essay)
+        data = serializer.data
+        comment_ori = data['comment']
+        
+        query_set = models.Essay.objects
+        query_set = query_set.filter(id=data['id'])
+        comment = comment_ori + [int(request.data['comment'])]
+        query_set[0].comment.set(comment)
+        query_set[0].save()
+       
+        return Response(EssaySerializer(query_set[0]).data)
+      
 class CreateOrGetEssayShareIdView(APIView):
     def post(self, request):
         try:
@@ -363,17 +415,25 @@ class CommentViewSet(UserModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = self.get_serializer(page, many=True)
+            serializer = serializers.CommentViewSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = serializers.CommentViewSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-
-        serializer = self.get_serializer(instance)
+        serializer = serializers.CommentViewSerializer(instance)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        data['user'] = request.user.id
+        serializer = serializers.CommentSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class RoadMapPutLikeView(APIView):
@@ -394,3 +454,4 @@ class RoadMapPutLikeView(APIView):
         query_set[0].save()
 
         return Response(RoadMapSerializer(query_set[0]).data)
+

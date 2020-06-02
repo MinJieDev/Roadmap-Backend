@@ -39,11 +39,6 @@ class Article(models.Model):
     tag = models.ManyToManyField(Tag, blank=True)
 
 
-class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.TextField(blank=True, default='')
-
-
 class Essay(models.Model):
     STATE_CHOICES = (('U', 'unfinished'),
                      ('I', 'writing'),
