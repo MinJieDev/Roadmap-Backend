@@ -209,7 +209,7 @@ class GetSharedRoadMapView(APIView):
 
     def get(self, request, map_sha256):
         roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
-        serializer = RoadMapSerializer(roadmap)
+        serializer = RoadMapRecursiveSerializer(roadmap)
         data = serializer.data
         roadmap_meta = json.loads(data['text'])
         nodes = roadmap_meta.get('nodes', [])
@@ -236,7 +236,7 @@ class GetSharedRoadMapView(APIView):
 class GetSharedEssayView(APIView):
     def get(self, request, map_sha256):
         essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
-        serializer = EssaySerializer(essay)
+        serializer = EssayRecursiveSerializer(essay)
         data = serializer.data
         essay_meta = json.loads(data['text'])
         refRoadmap = essay_meta.get('refRoadmap', '')
@@ -278,15 +278,33 @@ class RoadMapPutCommentView(APIView):
         roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
         serializer = RoadMapSerializer(roadmap)
         data = serializer.data
+        comment_ori = data['comment']
         
         query_set = models.RoadMap.objects
         query_set = query_set.filter(id=data['id'])
-        comment = request.data['comment']
+        comment = comment_ori + [int(request.data['comment'])]
         print(comment)
         query_set[0].comment.set(comment)
         query_set[0].save()
        
         return Response(RoadMapSerializer(query_set[0]).data)
+
+class EssayPutCommentView(APIView):
+    ARTICLE_REG = re.compile(r'^\$(\d+)$')
+
+    def put(self, request, map_sha256):
+        essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
+        serializer = EssaySerializer(essay)
+        data = serializer.data
+        comment_ori = data['comment']
+        
+        query_set = models.Essay.objects
+        query_set = query_set.filter(id=data['id'])
+        comment = comment_ori + [int(request.data['comment'])]
+        query_set[0].comment.set(comment)
+        query_set[0].save()
+       
+        return Response(EssaySerializer(query_set[0]).data)
       
 class CreateOrGetEssayShareIdView(APIView):
     def post(self, request):
