@@ -18,8 +18,8 @@ from rest_framework_jwt.serializers import (jwt_encode_handler,
 
 from . import models, serializers
 
-from .models import Article, RoadMap, RoadMapShareId
-from .serializers import ArticleSerializer, RoadMapSerializer, RoadMapRecursiveSerializer, RoadMapSerializer, ArticleRecursiveSerializer, EssayRecursiveSerializer
+from .models import Article, RoadMap, RoadMapShareId, Essay
+from .serializers import ArticleSerializer, EssaySerializer, RoadMapSerializer, RoadMapRecursiveSerializer, RoadMapSerializer, ArticleRecursiveSerializer, EssayRecursiveSerializer
 from .utils import UserModelViewSet
 
 from .models import Article, RoadMap, RoadMapShareId, User, Newpaper
@@ -174,16 +174,23 @@ class GetSharedRoadMapView(APIView):
         roadmap_meta = json.loads(data['text'])
         nodes = roadmap_meta.get('nodes', [])
         picked_articles = []
+        picked_essays = []
 
         for node in nodes:
-            title = node.get('text', '')
+            title = node.get('content', '')
             pattern = self.ARTICLE_REG.match(title)
             if pattern is not None:
                 article_id = int(pattern.group(1))
-                picked_articles.append(article_id)
+                if node.get('category', '') == 'article':
+                    picked_articles.append(article_id)
+                elif node.get('category', '') == 'essay':
+                    picked_essays.append(article_id)
         picked_articles = Article.objects.filter(user=roadmap.user, id__in=picked_articles)
         picked_articles = ArticleSerializer(picked_articles, many=True).data
-        data['articles'] = picked_articles
+        picked_essays = Essay.objects.filter(user=roadmap.user, id__in=picked_essays)
+        picked_essays = EssaySerializer(picked_essays, many=True).data
+        data['articles_used'] = picked_articles
+        data['essays_used'] = picked_essays
         return Response(data)
 
 
