@@ -211,6 +211,7 @@ class GetSharedRoadMapView(APIView):
 
 class CreateOrGetRoadMapShareIdView(APIView):
     def post(self, request):
+        print("a")
         try:
             road_map_id = json.loads(request.body)['id']
         except:
@@ -232,6 +233,22 @@ class CreateOrGetRoadMapShareIdView(APIView):
         record.save()
         return Response({'share_id': sha256})
 
+class RoadMapPutCommentView(APIView):
+    ARTICLE_REG = re.compile(r'^\$(\d+)$')
+
+    def put(self, request, map_sha256):
+        roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
+        serializer = RoadMapSerializer(roadmap)
+        data = serializer.data
+        
+        query_set = models.RoadMap.objects
+        query_set = query_set.filter(id=data['id'])
+        comment = request.data['comment']
+        print(comment)
+        query_set[0].comment.set(comment)
+        query_set[0].save()
+       
+        return Response(RoadMapSerializer(query_set[0]).data)
 
 class FeedbackViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
                       GenericViewSet):
