@@ -44,17 +44,17 @@ class EssaySerializer(serializers.ModelSerializer):
         model = models.Essay
         fields = '__all__'
 
-
-class EssayRecursiveSerializer(serializers.ModelSerializer):
-    tag = TagSerializer(read_only=True, many=True)
-    class Meta:
-        model = models.Essay
-        fields = '__all__'
-
 class CommentSerializer(serializers.ModelSerializer):
     user = UserViewSerializer()
     class Meta:
         model = models.Comment
+        fields = '__all__'
+
+class EssayRecursiveSerializer(serializers.ModelSerializer):
+    tag = TagSerializer(read_only=True, many=True)
+    comment = CommentSerializer(read_only=True, many=True)
+    class Meta:
+        model = models.Essay
         fields = '__all__'
 
 class RoadMapSerializer(serializers.ModelSerializer):
