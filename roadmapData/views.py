@@ -22,7 +22,7 @@ from .models import Article, RoadMap, RoadMapShareId, Essay
 from .serializers import ArticleSerializer, EssaySerializer, RoadMapSerializer, RoadMapRecursiveSerializer, RoadMapSerializer, ArticleRecursiveSerializer, EssayRecursiveSerializer
 from .utils import UserModelViewSet
 
-from .models import Article, RoadMap, RoadMapShareId, User, Newpaper
+from .models import Article, RoadMap, RoadMapShareId, EssayShareId, User, Newpaper
 from .serializers import ArticleSerializer, RoadMapSerializer
 from .utils import UserModelViewSet, UserListModelMixin
 
@@ -193,6 +193,19 @@ class GetSharedRoadMapView(APIView):
         data['essays_used'] = picked_essays
         return Response(data)
 
+class GetSharedEssayView(APIView):
+    def get(self, request, map_sha256):
+        essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
+        serializer = EssaySerializer(essay)
+        data = serializer.data
+        essay_meta = json.loads(data['text'])
+        refRoadmap = essay_meta.get('refRoadmap', '')
+
+        if refRoadmap != -1:
+            refRoadmapSHA = RoadMapShareId.objects.get(roadmap=refRoadmap).sha256
+            data['refRoadmapSHA'] = refRoadmapSHA
+        return Response(data)
+
 
 class CreateOrGetRoadMapShareIdView(APIView):
     def post(self, request):
@@ -214,6 +227,29 @@ class CreateOrGetRoadMapShareIdView(APIView):
         except RoadMapShareId.DoesNotExist:
             record = RoadMapShareId.objects.create(sha256=sha256,
                                                    roadmap=roadmap)
+        record.save()
+        return Response({'share_id': sha256})
+
+class CreateOrGetEssayShareIdView(APIView):
+    def post(self, request):
+        try:
+            essay_id = json.loads(request.body)['id']
+        except:
+            raise exceptions.ParseError()
+
+        essay = get_object_or_404(Essay, id=essay_id)
+
+        if essay.user != request.user:
+            self.permission_denied(request)
+
+        code = 'essay{}'.format(essay_id)
+        sha256 = sha256_func(code.encode()).hexdigest()
+        try:
+            record = EssayShareId.objects.get(sha256=sha256)
+            record.essay = essay
+        except EssayShareId.DoesNotExist:
+            record = EssayShareId.objects.create(sha256=sha256,
+                                                   essay=essay)
         record.save()
         return Response({'share_id': sha256})
 
