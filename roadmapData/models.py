@@ -38,6 +38,9 @@ class Article(models.Model):
     note = models.TextField(blank=True, default='')
     tag = models.ManyToManyField(Tag, blank=True)
 
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.TextField(blank=True, default='')
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -93,3 +96,4 @@ class Term(models.Model):
 class Newpaper(models.Model):
     term = models.ManyToManyField(Term, blank=True)
     text = models.TextField(blank=True, default='')
+
