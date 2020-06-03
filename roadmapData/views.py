@@ -54,6 +54,8 @@ class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
         return serializer.save()
 
     def list(self, request, *args, **kwargs):
+        if request.user.id == None:
+            raise exceptions.AuthenticationFailed()
         queryset = User.objects
         user = request.user
         queryset = queryset.filter(username=user)
