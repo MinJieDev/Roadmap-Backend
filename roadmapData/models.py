@@ -27,7 +27,7 @@ class Article(models.Model):
     author = models.TextField(blank=True, default='')
     journal = models.CharField(max_length=200, blank=True, default='')
     volume = models.IntegerField(blank=True, default=0)
-    pages = models.IntegerField(blank=True, default=0)
+    pages = models.CharField(max_length=100, blank=True, default="")
     years = models.IntegerField(blank=True, default=0)
     url = models.CharField(max_length=500, blank=True, default="")
     bibtext = models.TextField(blank=True, default='')
