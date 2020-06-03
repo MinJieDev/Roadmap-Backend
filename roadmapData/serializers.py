@@ -22,6 +22,7 @@ class UserViewSerializer(serializers.ModelSerializer):
         model = models.User
         fields = ('id', 'username')
 
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Tag
@@ -46,9 +47,10 @@ class EssaySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Essay
         fields = '__all__'
-
+        
 class CommentViewSerializer(serializers.ModelSerializer):
     user = UserViewSerializer()
+
     class Meta:
         model = models.Comment
         fields = '__all__'
@@ -102,5 +104,3 @@ class NewpaperSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Newpaper
         fields = '__all__'
-
-
