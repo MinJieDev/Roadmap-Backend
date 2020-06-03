@@ -444,14 +444,47 @@ class RoadMapPutLikeView(APIView):
         roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
         serializer = RoadMapSerializer(roadmap)
         data = serializer.data
+        like_ori = data['like']
 
         query_set = models.RoadMap.objects
         query_set = query_set.filter(id=data['id'])
         if action == 'like':
-            query_set[0].like.set(request.user)
+            if request.user.id not in like_ori:
+                query_set[0].like.set(like_ori + [request.user])
         else:
-            query_set[0].like.remove(request.user)
+            if request.user.id in like_ori:
+                like_new = []
+                for userid in like_ori:
+                    if userid != request.user.id:
+                        like_new.append(userid)
+                query_set[0].like.set(like_new)
         query_set[0].save()
 
         return Response(RoadMapSerializer(query_set[0]).data)
+
+class EssayPutLikeView(APIView):
+    ARTICLE_REG = re.compile(r'^\$(\d+)$')
+
+    def put(self, request, map_sha256):
+        action = json.loads(request.body)['action']
+        essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
+        serializer = EssaySerializer(essay)
+        data = serializer.data
+        like_ori = data['like']
+
+        query_set = models.Essay.objects
+        query_set = query_set.filter(id=data['id'])
+        if action == 'like':
+            if request.user.id not in like_ori:
+                query_set[0].like.set(like_ori + [request.user])
+        else:
+            if request.user.id in like_ori:
+                like_new = []
+                for userid in like_ori:
+                    if userid != request.user.id:
+                        like_new.append(userid)
+                query_set[0].like.set(like_new)
+        query_set[0].save()
+
+        return Response(EssaySerializer(query_set[0]).data)
 

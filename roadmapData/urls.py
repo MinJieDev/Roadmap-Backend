@@ -7,7 +7,7 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify
 from . import views
 
 from .views import CreateOrGetRoadMapShareIdView, GetSharedRoadMapView, GetSharedEssayView, GetNewpaperView, \
-    CreateOrGetEssayShareIdView, RoadMapPutLikeView, RoadMapPutCommentView, EssayPutCommentView
+    CreateOrGetEssayShareIdView, RoadMapPutLikeView, RoadMapPutCommentView, EssayPutCommentView, EssayPutLikeView
 
 router = DefaultRouter()
 router.register('users', views.UserViewSet, basename='users')
@@ -22,6 +22,7 @@ router.register('comments', views.CommentViewSet, basename='comments')
 
 urlpatterns = [
     path('roadmap_like/<str:map_sha256>/', RoadMapPutLikeView.as_view()),
+    path('essay_like/<str:map_sha256>/', EssayPutLikeView.as_view()),
     path('road_maps/<str:map_sha256>/', RoadMapPutCommentView.as_view()),
     path('essays/<str:map_sha256>/', EssayPutCommentView.as_view()),
     path('', include(router.urls)),
