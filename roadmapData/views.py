@@ -207,6 +207,8 @@ class GetSharedRoadMapView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
 
     def get(self, request, map_sha256):
+        if request.user.id == None:
+            raise exceptions.AuthenticationFailed()
         roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
         serializer = RoadMapRecursiveSerializer(roadmap)
         data = serializer.data
@@ -235,6 +237,8 @@ class GetSharedRoadMapView(APIView):
 
 class GetSharedEssayView(APIView):
     def get(self, request, map_sha256):
+        if request.user.id == None:
+            raise exceptions.AuthenticationFailed()
         essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
         serializer = EssayRecursiveSerializer(essay)
         data = serializer.data
