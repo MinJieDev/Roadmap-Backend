@@ -16,6 +16,8 @@ class ModelTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_user_model(self):
+        reponse = self.client.get("/api/users/", format='json')
+
         # get token
         data = {
             "password": "minjie",
@@ -25,6 +27,16 @@ class ModelTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user_token = json.loads(response.content)['token']
         self.client.credentials(HTTP_AUTHORIZATION='JWT ' + user_token)
+
+        reponse = self.client.get("/api/users/", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = {
+            "bio" : "sda"
+        }
+        reponse = self.client.put("/api/users/1.json", data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
 
     def test_article_model(self):
         # get token
@@ -52,6 +64,12 @@ class ModelTest(APITestCase):
         self.assertEqual(response_content["title"], "my article")
         self.assertEqual(response_content["author"], "edward")
 
+        response = self.client.get("/api/articles/?page=1", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get("/api/articles/", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         # update
         data = {
             "pages": "8",
@@ -59,7 +77,7 @@ class ModelTest(APITestCase):
         response = self.client.put("/api/articles/1.json", data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_content = json.loads(response.content)
-        self.assertEqual(response_content["pages"], 8)
+        self.assertEqual(response_content["pages"], '8')
 
         # delete
         response = self.client.delete("/api/articles/1.json", format='json')
@@ -92,6 +110,11 @@ class ModelTest(APITestCase):
         self.assertEqual(response_content["title"], "my essay")
         self.assertEqual(response_content["text"], "first essay")
 
+        response = self.client.get("/api/essays/?page=1", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get("/api/essays/", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         # update
         data = {
             "text": "12345",
@@ -131,6 +154,8 @@ class ModelTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_content = json.loads(response.content)
         self.assertEqual(response_content[0]['title'], "my roadmap")
+        response = self.client.get("/api/road_maps/?page=1", format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         response = self.client.get("/api/road_maps/1.json", format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -161,6 +186,18 @@ class ModelTest(APITestCase):
         response = self.client.post("/api/feedback/", data=data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response_content = json.loads(response.content)
+
+    def test_term_model(self):
+        # get token
+        data = {
+            "password": "minjie",
+            "username": "zzy"
+        }
+        response = self.client.post("/api/login/", data, format='json')
+        user_token = json.loads(response.content)['token']
+        self.client.credentials(HTTP_AUTHORIZATION='JWT ' + user_token)
+
+        response = self.client.get("/api/terms/", foramt='json')
 
     def test_tag_model(self):
         # get token
@@ -340,16 +377,6 @@ class PermissionTest(APITestCase):
                                      HTTP_AUTHORIZATION=self.http_authorization1,
                                      format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        share_id = json.loads(response.content)["share_id"]
-        response = self.client2.get("/api/share/roadmap/" + share_id + "/",
-                                    format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        response = self.client2.get("/api/share/roadmap/%d/" % rm_id,
-                                    format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
 
 class AuthTest(APITestCase):
     def setUp(self):

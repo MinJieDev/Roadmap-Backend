@@ -20,17 +20,6 @@ class UserListModelMixin(mixins.ListModelMixin):
             return None
         return super().paginate_queryset(queryset)
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        user = request.user
-        queryset = queryset.filter(user=user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
 
 
 class UserCreateModelMixin(mixins.CreateModelMixin):

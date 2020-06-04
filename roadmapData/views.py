@@ -62,23 +62,7 @@ class UserViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):
-        user = request.user
-        instance = self.get_object()
-        if instance.username != user.username:
-            raise exceptions.PermissionDenied()
-        data = request.data
-        data['user'] = request.user.id
-
-        partial = kwargs.pop('partial', False)
-        serializer = self.get_serializer(instance, data=data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-
-        if getattr(instance, '_prefetched_objects_cache', None):
-            instance._prefetched_objects_cache = {}
-
-        return Response(serializer.data)
+    
 
 
 class UserDefinePagination(PageNumberPagination):
@@ -179,9 +163,6 @@ class RoadMapViewSet(UserModelViewSet):
         instance = self.get_object()
         data = request.data
 
-        if instance.user != user and not (len(data) == 1 and list(data.keys())[0] == 'comment'):
-            raise exceptions.PermissionDenied()
-
         data['user'] = RoadMapSerializer(instance).data['user']
         partial = kwargs.pop('partial', False)
         serializer = self.get_serializer(instance, data=data, partial=partial)
@@ -208,58 +189,15 @@ class RoadMapViewSet(UserModelViewSet):
 class GetSharedRoadMapView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
 
-    def get(self, request, map_sha256):
-        if request.user.id == None:
-            raise exceptions.AuthenticationFailed()
-        roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
-        serializer = RoadMapRecursiveSerializer(roadmap)
-        data = serializer.data
-        roadmap_meta = json.loads(data['text'])
-        nodes = roadmap_meta.get('nodes', [])
-        picked_articles = []
-        picked_essays = []
-
-        for node in nodes:
-            title = node.get('content', '')
-            pattern = self.ARTICLE_REG.match(title)
-            if pattern is not None:
-                article_id = int(pattern.group(1))
-                if node.get('category', '') == 'article':
-                    picked_articles.append(article_id)
-                elif node.get('category', '') == 'essay':
-                    picked_essays.append(article_id)
-        picked_articles = Article.objects.filter(user=roadmap.user, id__in=picked_articles)
-        picked_articles = ArticleSerializer(picked_articles, many=True).data
-        picked_essays = Essay.objects.filter(user=roadmap.user, id__in=picked_essays)
-        picked_essays = EssaySerializer(picked_essays, many=True).data
-        data['articles_used'] = picked_articles
-        data['essays_used'] = picked_essays
-        return Response(data)
 
 
 class GetSharedEssayView(APIView):
-    def get(self, request, map_sha256):
-        if request.user.id == None:
-            raise exceptions.AuthenticationFailed()
-        essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
-        serializer = EssayRecursiveSerializer(essay)
-        data = serializer.data
-        essay_meta = json.loads(data['text'])
-        refRoadmap = essay_meta.get('refRoadmap', '')
-
-        if refRoadmap != -1:
-            refRoadmapSHA = RoadMapShareId.objects.get(roadmap=refRoadmap).sha256
-            data['refRoadmapSHA'] = refRoadmapSHA
-        return Response(data)
+    x = 1
 
 
 class CreateOrGetRoadMapShareIdView(APIView):
     def post(self, request):
-        print("a")
-        try:
-            road_map_id = json.loads(request.body)['id']
-        except:
-            raise exceptions.ParseError()
+        road_map_id = json.loads(request.body)['id']
 
         roadmap = get_object_or_404(RoadMap, id=road_map_id)
 
@@ -280,61 +218,11 @@ class CreateOrGetRoadMapShareIdView(APIView):
 class RoadMapPutCommentView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
 
-    def put(self, request, map_sha256):
-        roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
-        serializer = RoadMapSerializer(roadmap)
-        data = serializer.data
-        comment_ori = data['comment']
-        
-        query_set = models.RoadMap.objects
-        query_set = query_set.filter(id=data['id'])
-        comment = comment_ori + [int(request.data['comment'])]
-        print(comment)
-        query_set[0].comment.set(comment)
-        query_set[0].save()
-       
-        return Response(RoadMapSerializer(query_set[0]).data)
-
 class EssayPutCommentView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
-
-    def put(self, request, map_sha256):
-        essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
-        serializer = EssaySerializer(essay)
-        data = serializer.data
-        comment_ori = data['comment']
-        
-        query_set = models.Essay.objects
-        query_set = query_set.filter(id=data['id'])
-        comment = comment_ori + [int(request.data['comment'])]
-        query_set[0].comment.set(comment)
-        query_set[0].save()
-       
-        return Response(EssaySerializer(query_set[0]).data)
-      
+    
 class CreateOrGetEssayShareIdView(APIView):
-    def post(self, request):
-        try:
-            essay_id = json.loads(request.body)['id']
-        except:
-            raise exceptions.ParseError()
-
-        essay = get_object_or_404(Essay, id=essay_id)
-
-        if essay.user != request.user:
-            self.permission_denied(request)
-
-        code = 'essay{}'.format(essay_id)
-        sha256 = sha256_func(code.encode()).hexdigest()
-        try:
-            record = EssayShareId.objects.get(sha256=sha256)
-            record.essay = essay
-        except EssayShareId.DoesNotExist:
-            record = EssayShareId.objects.create(sha256=sha256,
-                                                 essay=essay)
-        record.save()
-        return Response({'share_id': sha256})
-
+    x = 1
 
 class FeedbackViewSet(mixins.CreateModelMixin,  # only CREATE is permitted
                       GenericViewSet):
@@ -346,35 +234,6 @@ class TagViewSet(UserModelViewSet):
     queryset = models.Tag.objects
     serializer_class = serializers.TagSerializer
     permission_classes = (IsAuthenticated,)
-
-    def paginate_queryset(self, queryset):
-        if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
-            return None
-        return super().paginate_queryset(queryset)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        user = request.user
-        queryset = queryset.filter(user=user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        for i in range(len(serializer.data)):
-            article_query = queryset[i].article_set.all()
-            article_list = [j.id for j in article_query]
-            essay_query = queryset[i].essay_set.all()
-            essay_list = [j.id for j in essay_query]
-            road_map_query = queryset[i].roadmap_set.all()
-            road_map_list = [j.id for j in road_map_query]
-
-            serializer.data[i]['articles'] = article_list
-            serializer.data[i]['essays'] = essay_list
-            serializer.data[i]['road_maps'] = road_map_list
-
-        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -402,14 +261,7 @@ class NewpaperViewSet(viewsets.ModelViewSet):
 
 
 class GetNewpaperView(APIView):
-    def get(self, request, interest):
-        term = models.Term.objects.get(name=interest)
-        newpapers = Newpaper.objects.filter(term=term.id).all()
-        data = []
-        for newpaper in newpapers:
-            serializer = serializers.NewpaperSerializer(newpaper)
-            data.append(serializer.data)
-        return Response(data)
+    x = 1
 
 
 class CommentViewSet(UserModelViewSet):
@@ -417,80 +269,10 @@ class CommentViewSet(UserModelViewSet):
     serializer_class = serializers.CommentSerializer
     permission_classes = ()
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = serializers.CommentViewSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = serializers.CommentViewSerializer(queryset, many=True)
-        return Response(serializer.data)
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = serializers.CommentViewSerializer(instance)
-        return Response(serializer.data)
-
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        data['user'] = request.user.id
-        serializer = serializers.CommentSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-
 class RoadMapPutLikeView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
-
-    def put(self, request, map_sha256):
-        action = json.loads(request.body)['action']
-        roadmap = get_object_or_404(RoadMapShareId, sha256=map_sha256).roadmap
-        serializer = RoadMapSerializer(roadmap)
-        data = serializer.data
-        like_ori = data['like']
-
-        query_set = models.RoadMap.objects
-        query_set = query_set.filter(id=data['id'])
-        if action == 'like':
-            if request.user.id not in like_ori:
-                query_set[0].like.set(like_ori + [request.user])
-        else:
-            if request.user.id in like_ori:
-                like_new = []
-                for userid in like_ori:
-                    if userid != request.user.id:
-                        like_new.append(userid)
-                query_set[0].like.set(like_new)
-        query_set[0].save()
-
-        return Response(RoadMapSerializer(query_set[0]).data)
 
 class EssayPutLikeView(APIView):
     ARTICLE_REG = re.compile(r'^\$(\d+)$')
 
-    def put(self, request, map_sha256):
-        action = json.loads(request.body)['action']
-        essay = get_object_or_404(EssayShareId, sha256=map_sha256).essay
-        serializer = EssaySerializer(essay)
-        data = serializer.data
-        like_ori = data['like']
-
-        query_set = models.Essay.objects
-        query_set = query_set.filter(id=data['id'])
-        if action == 'like':
-            if request.user.id not in like_ori:
-                query_set[0].like.set(like_ori + [request.user])
-        else:
-            if request.user.id in like_ori:
-                like_new = []
-                for userid in like_ori:
-                    if userid != request.user.id:
-                        like_new.append(userid)
-                query_set[0].like.set(like_new)
-        query_set[0].save()
-
-        return Response(EssaySerializer(query_set[0]).data)
-
+    
