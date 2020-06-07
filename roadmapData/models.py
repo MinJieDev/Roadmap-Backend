@@ -24,6 +24,7 @@ class Article(models.Model):
 
     title = models.CharField(max_length=200, blank=True, default='')
     alias = models.CharField(max_length=200, blank=True, default='')
+    abbrtitle = models.CharField(max_length=200, blank=True, default='')
     author = models.TextField(blank=True, default='')
     journal = models.CharField(max_length=200, blank=True, default='')
     volume = models.IntegerField(blank=True, default=0)
